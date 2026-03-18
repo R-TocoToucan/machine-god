@@ -50,8 +50,12 @@ def classify(task: str) -> dict:
         max_tokens=128,
         messages=[{"role": "user", "content": CLASSIFIER_PROMPT + "\n\nTask: " + task}],
     )
-    return json.loads(resp.content[0].text.strip())
-
+    raw = resp.content[0].text.strip()
+    if raw.startswith("```"):
+        raw = raw.split("```")[1]
+        if raw.startswith("json"):
+            raw = raw[4:]
+    return json.loads(raw.strip())
 
 def run_task(task: str, tier: str) -> str:
     """Execute task with the assigned model tier."""
