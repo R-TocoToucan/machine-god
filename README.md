@@ -9,7 +9,7 @@
 
 You are the captain of the SSV Ardent, a massive warship pushing through hostile star systems. Combat runs fully automatically in the background — your job isn't to fight. Your job is to *live well*.
 
-Complete real-life daily habits and quests to supply the ship with resources. Those resources fund upgrades, power auto-battles, clear stages, and unlock story content with a cast of characters who actually care whether you went to the gym today.
+Complete real-life daily habits and quests to supply the ship with resources. Those resources fund upgrades, power auto-battles, clear stages, and unlock story content.
 
 ## Core Loop
 
@@ -55,14 +55,7 @@ Miss your habits → ship underperforms. Stay consistent → watch it dominate.
 
 ### 4. Character Affection System
 
-Four crew members, each with their own personality and linked gameplay systems. Earn affection points through quest completion and story choices to unlock Visual Novel episodes.
-
-| Character | Role | Personality | Linked To |
-|-----------|------|-------------|-----------|
-| **Yuira** | Navigator | Serious, tsundere | Exercise / work quests |
-| **Serina** | Engineer | Cheerful, playful | Ship upgrades |
-| **Artemis** | Tactical AI | Cool → gradually humanizes | Combat / stage clears |
-| **Minha** | Medical Officer | Warm, naggy | Sleep / diet / exercise quests |
+Characters TBD. Affection points earned through quest completion and story choices unlock Visual Novel episodes.
 
 ### 5. Weekly Self-Report
 
@@ -74,7 +67,7 @@ Every Sunday evening, a popup asks the player to self-report:
 
 ### 6. Visual Novel Story
 
-Story episodes unlock per stage clear. Full branching narrative with romance routes for each crew member, powered by Naninovel. Choices carry weight across the campaign.
+Story episodes unlock per stage clear. Full branching narrative with romance routes, powered by Naninovel. Choices carry weight across the campaign.
 
 ## Tech Stack
 
@@ -85,28 +78,6 @@ Story episodes unlock per stage clear. Full branching narrative with romance rou
 | Narrative System | Naninovel | Branching dialogue, character expressions, VN episodes |
 | Language | C# | All gameplay and systems logic |
 | Platform | Windows first | macOS planned for later |
-
-## Characters
-
-### Yuira — Navigator
-*"You skipped your run again, didn't you? ...I can tell."*
-
-Serious and sharp, with a tsundere edge. She tracks the ship's course and doesn't tolerate slacking — but her concern runs deeper than she lets on. Linked to exercise and work-related quests.
-
-### Serina — Engineer
-*"Ooh, new parts! Let me see, let me see!"*
-
-Endlessly cheerful and playful. Lives in the engine room and gets genuinely excited about every upgrade. Her enthusiasm is infectious. Linked to the ship upgrade system.
-
-### Artemis — Tactical AI
-*"Emotional response noted. Filing under: irrelevant. ...For now."*
-
-Starts as a cold, efficient combat AI. Over time — through stage clears and story progression — begins developing something uncomfortably close to feelings. Linked to combat performance and stage clears.
-
-### Minha — Medical Officer
-*"Did you eat a real meal today? And no, instant ramen doesn't count."*
-
-Warm, caring, and just a little naggy — like a big sister who worries too much. Monitors crew (and captain) wellbeing. Linked to sleep, diet, and exercise quests.
 
 ## License
 
