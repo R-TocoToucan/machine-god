@@ -3,3 +3,11 @@
 data/config/
 __pycache__/
 *.log
+```
+# Unity
+StellarCommand/Library/
+StellarCommand/Temp/
+StellarCommand/Logs/
+StellarCommand/UserSettings/
+StellarCommand/obj/
+StellarCommand/.vs/
