@@ -1,4 +1,8 @@
 ﻿<Solution>
+  <Project Path="StellarCommand.Core.PlayModeTests.csproj" />
+  <Project Path="StellarCommand.Core.csproj" />
   <Project Path="Assembly-CSharp-Editor.csproj" />
   <Project Path="Assembly-CSharp.csproj" />
+  <Project Path="StellarCommand.Editor.csproj" />
+  <Project Path="StellarCommand.Core.EditModeTests.csproj" />
 </Solution>
