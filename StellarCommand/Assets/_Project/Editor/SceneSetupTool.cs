@@ -60,8 +60,35 @@ namespace StellarCommand.Editor
             AddIfMissing<SaveManager>("SaveManager");
             AddIfMissing<BootManager>("BootManager");
 
+            // Enforce exactly one AudioListener in Boot (the persistent scene)
+            EnforceOneAudioListener();
+
             EditorSceneManager.SaveScene(scene);
             Debug.Log("[SceneSetupTool] Boot.unity updated.");
+        }
+
+        private static void EnforceOneAudioListener()
+        {
+#pragma warning disable CS0618
+            var listeners = Object.FindObjectsOfType<AudioListener>();
+#pragma warning restore CS0618
+            if (listeners.Length == 0)
+            {
+#pragma warning disable CS0618
+                var cam = Object.FindObjectOfType<Camera>();
+#pragma warning restore CS0618
+                var target = cam != null ? cam.gameObject : new GameObject("AudioListener");
+                target.AddComponent<AudioListener>();
+                Debug.Log("[SceneSetupTool] Added missing AudioListener to Boot scene.");
+            }
+            else
+            {
+                for (int i = 1; i < listeners.Length; i++)
+                {
+                    Debug.Log($"[SceneSetupTool] Removed duplicate AudioListener from {listeners[i].gameObject.name}.");
+                    Object.DestroyImmediate(listeners[i]);
+                }
+            }
         }
 
         private static void AddIfMissing<T>(string goName) where T : Component
@@ -176,6 +203,15 @@ namespace StellarCommand.Editor
             ctrlSO.FindProperty("_quitButton").objectReferenceValue     = quitBtn.GetComponent<Button>();
             ctrlSO.FindProperty("_confirmDialog").objectReferenceValue  = confirmDialogComp;
             ctrlSO.ApplyModifiedPropertiesWithoutUndo();
+
+            // Strip every AudioListener — MainMenu loads additively over Boot which owns the one listener
+#pragma warning disable CS0618
+            foreach (var al in Object.FindObjectsOfType<AudioListener>())
+#pragma warning restore CS0618
+            {
+                Debug.Log($"[SceneSetupTool] Removed AudioListener from MainMenu/{al.gameObject.name}.");
+                Object.DestroyImmediate(al);
+            }
 
             EditorSceneManager.SaveScene(scene, MainMenuScenePath);
             AssetDatabase.Refresh();
