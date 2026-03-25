@@ -1,7 +1,7 @@
 {
     "name": "StellarCommand.Core",
     "rootNamespace": "StellarCommand.Core",
-    "references": [],
+    "references": ["Unity.TextMeshPro"],
     "includePlatforms": [],
     "excludePlatforms": [],
     "allowUnsafeCode": false,
