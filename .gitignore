@@ -11,3 +11,6 @@ StellarCommand/Logs/
 StellarCommand/UserSettings/
 StellarCommand/obj/
 StellarCommand/.vs/
+# Firebase large native binaries (>100MB, exceed GitHub limit)
+StellarCommand/Assets/Firebase/Plugins/x86_64/*.bundle
+StellarCommand/Assets/Firebase/Plugins/x86_64/*.so
