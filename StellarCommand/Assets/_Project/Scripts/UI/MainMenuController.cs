@@ -10,6 +10,12 @@ namespace StellarCommand.Core
         [SerializeField] private Button _settingsButton;
         [SerializeField] private Button _quitButton;
 
+        [Header("Settings")]
+        [SerializeField] private SettingsPanel _settingsPanel;
+
+        [Header("Link Account")]
+        [SerializeField] private Button _linkAccountButton;
+
         [Header("Dialogs")]
         [SerializeField] private ConfirmDialog _confirmDialog;
 
@@ -22,6 +28,11 @@ namespace StellarCommand.Core
             _newGameButton.onClick.AddListener(OnNewGameClicked);
             _settingsButton.onClick.AddListener(OnSettingsClicked);
             _quitButton.onClick.AddListener(OnQuitClicked);
+
+            if (_linkAccountButton != null)
+            {
+                _linkAccountButton.onClick.AddListener(OnLinkAccountClicked);
+            }
         }
 
         private void OnNewGameClicked()
@@ -44,8 +55,12 @@ namespace StellarCommand.Core
 
         private void OnSettingsClicked()
         {
-            // Settings UI will be wired in Plan 01-03
-            Debug.Log("[MainMenu] Settings clicked -- not yet implemented.");
+            _settingsPanel.Show();
+        }
+
+        private void OnLinkAccountClicked()
+        {
+            Debug.Log("[MainMenu] Link Account clicked -- not yet implemented (Plan 01-04).");
         }
 
         private void OnQuitClicked()
