@@ -1,0 +1,14 @@
+{
+    "name": "StellarCommand.Core.PlayModeTests",
+    "rootNamespace": "StellarCommand.Core.Tests.PlayMode",
+    "references": ["StellarCommand.Core", "UnityEngine.TestRunner", "UnityEditor.TestRunner"],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": true,
+    "precompiledReferences": ["nunit.framework.dll"],
+    "autoReferenced": false,
+    "defineConstraints": ["UNITY_INCLUDE_TESTS"],
+    "versionDefines": [],
+    "noEngineReferences": false
+}
