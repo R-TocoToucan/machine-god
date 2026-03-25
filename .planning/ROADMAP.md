@@ -33,7 +33,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 
 Plans:
 - [x] 01-01: SaveManager hardening — add `saveVersion` integer to all save structs, implement atomic write (write-temp-then-move pattern), validate `Application.persistentDataPath` in both Editor and build, write stub `MigrateFrom()` on each save data class
-- [ ] 01-02: Scene flow and GameManager — upgrade BootManager to async additive loading using `Awaitable`, create `SceneController` singleton with `LoadSceneAsync(sceneName, unloadScene)`, implement `GameState` enum (`Boot / MainMenu / Playing / Paused`) and `OnStateChanged` C# event on GameManager, wire Boot → Main Menu transition
+- [x] 01-02: Scene flow and GameManager — upgrade BootManager to async additive loading using `Awaitable`, create `SceneController` singleton with `LoadSceneAsync(sceneName, unloadScene)`, implement `GameState` enum (`Boot / MainMenu / Playing / Paused`) and `OnStateChanged` C# event on GameManager, wire Boot → Main Menu transition
 - [ ] 01-03: Settings system and Audio — create `SettingsManager` singleton wrapping PlayerPrefs with typed constants (`SettingsKeys`), wire Master/Music/SFX Audio Mixer buses to settings values, implement `background FPS cap` via `Application.targetFrameRate` on focus change (default 10 fps), build Settings UI in Main Menu
 - [ ] 01-04: Firebase auth and sync — integrate Firebase SDK (Anonymous auth silent sign-in on Boot), implement single-JSON-document-per-user sync layer on SaveManager (Firestore or Realtime DB — resolve open decision before implementing), add "Link Account" Google Sign-In flow in Settings with data-preservation guarantee
 

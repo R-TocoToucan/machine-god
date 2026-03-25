@@ -12,16 +12,16 @@
 - [x] **FOUND-03**: Save writes are atomic (write-temp-then-move) to prevent corruption on crash
 - [ ] **FOUND-04**: Save state syncs to Firebase (Firestore or Realtime Database — TBD) as a corruption-proof backup per user document
 - [x] **FOUND-05**: Boot scene auto-loads existing save on start; no "Continue" choice needed
-- [ ] **FOUND-06**: Boot scene initializes all core singletons before transitioning
-- [ ] **FOUND-07**: Scene flow supports Boot → Main Menu → Game with async additive loading
-- [ ] **FOUND-08**: Main menu has New Game (triggers data wipe confirmation), Settings, and Quit — no load option
+- [x] **FOUND-06**: Boot scene initializes all core singletons before transitioning
+- [x] **FOUND-07**: Scene flow supports Boot → Main Menu → Game with async additive loading
+- [x] **FOUND-08**: Main menu has New Game (triggers data wipe confirmation), Settings, and Quit — no load option
 - [ ] **FOUND-09**: Settings persist across sessions (audio volume, display resolution, fullscreen toggle)
 - [ ] **FOUND-10**: Settings include a background FPS cap option (default: 10fps when unfocused)
 - [ ] **FOUND-11**: Game launches with Firebase Anonymous auth silently — no login screen
 - [ ] **FOUND-12**: Settings include a "Link Account" button to upgrade anonymous auth to Google Sign-In
 - [ ] **FOUND-13**: Account linking preserves all existing save data
 - [ ] **FOUND-14**: Google-linked accounts restore save data on reinstall or new device
-- [ ] **FOUND-15**: GameManager exposes a GameState enum with C# events for state transitions
+- [x] **FOUND-15**: GameManager exposes a GameState enum with C# events for state transitions
 
 ### Habit Quest System
 

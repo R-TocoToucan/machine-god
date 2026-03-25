@@ -2,14 +2,14 @@
 gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
-status: unknown
-stopped_at: Completed 01-01-PLAN.md
-last_updated: "2026-03-25T21:03:15.861Z"
+status: Ready to execute
+stopped_at: Completed 01-02-PLAN.md
+last_updated: "2026-03-25T23:34:20.890Z"
 progress:
   total_phases: 4
   completed_phases: 0
   total_plans: 4
-  completed_plans: 1
+  completed_plans: 2
 ---
 
 # Project State
@@ -24,7 +24,7 @@ See: .planning/PROJECT.md (updated 2026-03-24)
 ## Current Position
 
 Phase: 01 (system-foundations) — EXECUTING
-Plan: 2 of 4
+Plan: 3 of 4
 
 ## Performance Metrics
 
@@ -47,6 +47,7 @@ Plan: 2 of 4
 
 *Updated after each plan completion*
 | Phase 01 P01 | 3 | 2 tasks | 13 files |
+| Phase 01 P02 | multi-session | 3 tasks | 22 files |
 
 ## Accumulated Context
 
@@ -61,6 +62,9 @@ Recent decisions affecting current work:
 - [Pre-Phase 1]: SO definition / C# runtime state split is enforced from Phase 1 — never store runtime state on SOs
 - [Phase 01]: Extracted atomic write into static AtomicFileWriter class for testability without MonoBehaviour
 - [Phase 01]: Unified save API around single GameSaveData class, removed generic Save<T>/Load<T>
+- [Phase 01]: Used async Awaitable (Unity 6 native) for all scene transitions instead of coroutines
+- [Phase 01]: Boot scene persists with singletons while MainMenu loads additively on top
+- [Phase 01]: Moved StellarCommand.Core.asmdef to Scripts/ root to cover all subdirectories including UI/
 
 ### Pending Todos
 
@@ -74,6 +78,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-03-25T21:03:15.855Z
-Stopped at: Completed 01-01-PLAN.md
+Last session: 2026-03-25T23:34:20.886Z
+Stopped at: Completed 01-02-PLAN.md
 Resume file: None
