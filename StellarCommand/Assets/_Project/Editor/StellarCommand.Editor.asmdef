@@ -1,0 +1,17 @@
+{
+    "name": "StellarCommand.Editor",
+    "rootNamespace": "StellarCommand.Editor",
+    "references": [
+        "StellarCommand.Core",
+        "Unity.TextMeshPro"
+    ],
+    "includePlatforms": ["Editor"],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": false,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}
