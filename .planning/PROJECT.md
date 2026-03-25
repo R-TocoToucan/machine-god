@@ -58,6 +58,10 @@ Real-life habits directly fuel the spaceship — the game only gets better when 
 | Manual habit check-in (not auto-tracked) | Simpler, more reliable; external tracking adds scope and privacy complexity | — Pending |
 | Windows-only for v1 | Win32 API wallpaper mode is the differentiating feature; cross-platform deferred | — Pending |
 | Automated combat (not player-controlled) | Keeps the game idle; combat power comes from real-life behavior, not reaction time | — Pending |
+| Firebase Anonymous auth by default | No login friction on first launch; anonymous UID keys the save doc | — Pending |
+| Optional Google Sign-In link in settings | Preserves all save data on link; enables cross-device restore for linked accounts | — Pending |
+| Anonymous save data lost on reinstall without linking | Acceptable tradeoff; documented behavior, not a bug | — Pending |
+| Single JSON save document per user in Firebase | Idle game state is a flat blob; no relational structure needed; Firestore vs Realtime DB TBD | — Pending |
 
 ## Evolution
 
@@ -77,4 +81,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-03-21 after initialization*
+*Last updated: 2026-03-24 after requirements + roadmap definition*
