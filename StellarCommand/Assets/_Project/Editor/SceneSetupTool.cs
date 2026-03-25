@@ -179,8 +179,10 @@ namespace StellarCommand.Editor
             msgTMP.color = Color.white;
             msgTMP.enableWordWrapping = true;
 
-            var confirmBtn = CreateButton("ConfirmButton", dialogBox.transform, "Confirm", new Vector2(-90, -60));
-            var cancelBtn  = CreateButton("CancelButton",  dialogBox.transform, "Cancel",  new Vector2( 90, -60));
+            // 180×45 buttons at ±110px: 40px gap, 80px side padding within the 560px dialog box
+            var dialogBtnSize = new Vector2(180, 45);
+            var confirmBtn = CreateButton("ConfirmButton", dialogBox.transform, "Confirm", new Vector2(-110, -68), dialogBtnSize);
+            var cancelBtn  = CreateButton("CancelButton",  dialogBox.transform, "Cancel",  new Vector2( 110, -68), dialogBtnSize);
 
             // Wire ConfirmDialog serialized fields
             var confirmSO = new SerializedObject(confirmDialogComp);
@@ -281,10 +283,12 @@ namespace StellarCommand.Editor
             rect.anchoredPosition = position;
         }
 
-        private static GameObject CreateButton(string name, Transform parent, string label, Vector2 position)
+        private static GameObject CreateButton(string name, Transform parent, string label, Vector2 position,
+            Vector2 size = default)
         {
+            if (size == default) size = new Vector2(300, 55);
             var go    = CreatePanel(name, parent, new Color(0.18f, 0.18f, 0.28f));
-            SetAnchored(go, new Vector2(0.5f, 0.5f), new Vector2(300, 55), position);
+            SetAnchored(go, new Vector2(0.5f, 0.5f), size, position);
 
             var btn    = go.AddComponent<Button>();
             var colors = btn.colors;
