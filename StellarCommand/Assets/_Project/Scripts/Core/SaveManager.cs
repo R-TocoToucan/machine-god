@@ -5,15 +5,20 @@ using UnityEngine;
 namespace StellarCommand.Core
 {
     /// <summary>
-    /// Generic JSON save/load system.
-    /// Saves to Application.persistentDataPath/Saves/
-    /// Usage:
-    ///   SaveManager.Instance.Save("quests", myQuestSaveData);
-    ///   var data = SaveManager.Instance.Load<QuestSaveData>("quests");
+    /// Unified save system for GameSaveData.
+    /// Uses atomic writes (write-to-tmp, File.Replace) with .bak fallback.
+    /// Auto-loads on boot, auto-saves on focus loss.
     /// </summary>
     public class SaveManager : MonoSingleton<SaveManager>
     {
+        private GameSaveData _currentData;
         private string _saveDir;
+        private const string SaveFileName = "game.json";
+
+        /// <summary>
+        /// Read access to the current in-memory save data.
+        /// </summary>
+        public GameSaveData Data => _currentData;
 
         protected override void OnInitialize()
         {
@@ -24,95 +29,101 @@ namespace StellarCommand.Core
                 Directory.CreateDirectory(_saveDir);
                 Debug.Log($"[SaveManager] Save directory created at: {_saveDir}");
             }
+
+            // Auto-load existing save on boot (per FOUND-05)
+            LoadFromDisk();
         }
 
-        // ── Public API ──────────────────────────────────────────────────────────
+        // -- Public API -------------------------------------------------------
 
         /// <summary>
-        /// Serialize and write data to disk as JSON.
+        /// Serialize current save data to disk using atomic write.
         /// </summary>
-        public void Save<T>(string key, T data)
+        public void Save()
         {
             try
             {
-                string json = JsonUtility.ToJson(data, prettyPrint: true);
-                string path = GetPath(key);
-                File.WriteAllText(path, json);
-                Debug.Log($"[SaveManager] Saved '{key}' → {path}");
+                _currentData.lastSaveTimestamp = DateTimeOffset.UtcNow.ToUnixTimeSeconds();
+                string json = JsonUtility.ToJson(_currentData, true);
+                AtomicFileWriter.WriteAtomic(GetPath(), json);
+                Debug.Log("[SaveManager] Game saved.");
             }
             catch (Exception e)
             {
-                Debug.LogError($"[SaveManager] Failed to save '{key}': {e.Message}");
+                Debug.LogError($"[SaveManager] Failed to save: {e.Message}");
             }
         }
 
         /// <summary>
-        /// Load and deserialize data from disk.
-        /// Returns default(T) if file does not exist.
+        /// Load save data from disk with .bak fallback.
+        /// If no valid save exists, creates new via GameSaveData.CreateNew().
         /// </summary>
-        public T Load<T>(string key)
+        public void LoadFromDisk()
         {
-            string path = GetPath(key);
-
-            if (!File.Exists(path))
-            {
-                Debug.Log($"[SaveManager] No save file found for '{key}'. Returning default.");
-                return default;
-            }
-
-            try
-            {
-                string json = File.ReadAllText(path);
-                T data = JsonUtility.FromJson<T>(json);
-                Debug.Log($"[SaveManager] Loaded '{key}' ← {path}");
-                return data;
-            }
-            catch (Exception e)
-            {
-                Debug.LogError($"[SaveManager] Failed to load '{key}': {e.Message}");
-                return default;
-            }
+            string path = GetPath();
+            _currentData = AtomicFileWriter.LoadWithFallback(path);
+            MigrateIfNeeded();
+            Debug.Log($"[SaveManager] Save loaded (version {_currentData.saveVersion}).");
         }
 
         /// <summary>
-        /// Check whether a save file exists for the given key.
+        /// Check whether the save file exists on disk.
         /// </summary>
-        public bool Exists(string key)
+        public bool Exists()
         {
-            return File.Exists(GetPath(key));
+            return File.Exists(GetPath());
         }
 
         /// <summary>
-        /// Delete a save file by key.
-        /// </summary>
-        public void Delete(string key)
-        {
-            string path = GetPath(key);
-
-            if (File.Exists(path))
-            {
-                File.Delete(path);
-                Debug.Log($"[SaveManager] Deleted save file for '{key}'.");
-            }
-        }
-
-        /// <summary>
-        /// Wipe all save files. Use with caution.
+        /// Wipe all save files and reset to a fresh save.
         /// </summary>
         public void DeleteAll()
         {
-            foreach (string file in Directory.GetFiles(_saveDir, "*.json"))
-            {
-                File.Delete(file);
-            }
-            Debug.LogWarning("[SaveManager] All save files deleted.");
+            string path = GetPath();
+            string tmpPath = path + ".tmp";
+            string bakPath = path + ".bak";
+
+            if (File.Exists(path)) File.Delete(path);
+            if (File.Exists(tmpPath)) File.Delete(tmpPath);
+            if (File.Exists(bakPath)) File.Delete(bakPath);
+
+            _currentData = GameSaveData.CreateNew();
+            Debug.LogWarning("[SaveManager] All save files deleted. Fresh save created.");
         }
 
-        // ── Internal ─────────────────────────────────────────────────────────────
+        // -- Auto-save triggers -----------------------------------------------
 
-        private string GetPath(string key)
+        /// <summary>
+        /// Auto-save when the application loses focus (per D-04).
+        /// Other auto-save triggers (habit completion, resource update, report submit)
+        /// are wired by consuming systems via SaveManager.Instance.Save().
+        /// </summary>
+        private void OnApplicationFocus(bool hasFocus)
         {
-            return Path.Combine(_saveDir, $"{key}.json");
+            if (!hasFocus && _currentData != null)
+            {
+                Save();
+                Debug.Log("[SaveManager] Auto-saved on focus loss.");
+            }
+        }
+
+        // -- Internal ---------------------------------------------------------
+
+        private void MigrateIfNeeded()
+        {
+            int currentVersion = GameSaveData.CreateNew().saveVersion;
+            if (_currentData.saveVersion < currentVersion)
+            {
+                Debug.Log($"[SaveManager] Migrating save from v{_currentData.saveVersion} to v{currentVersion}.");
+                _currentData.MigrateFrom(_currentData.saveVersion);
+                _currentData.saveVersion = currentVersion;
+                Save();
+            }
+        }
+
+        private string GetPath()
+        {
+            return Path.Combine(_saveDir, SaveFileName);
         }
     }
 }
