@@ -3,7 +3,8 @@
     "rootNamespace": "StellarCommand.Editor",
     "references": [
         "StellarCommand.Core",
-        "Unity.TextMeshPro"
+        "Unity.TextMeshPro",
+        "Unity.InputSystem"
     ],
     "includePlatforms": ["Editor"],
     "excludePlatforms": [],

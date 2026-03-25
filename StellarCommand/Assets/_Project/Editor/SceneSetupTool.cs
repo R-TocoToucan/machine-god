@@ -7,6 +7,9 @@ using UnityEditor;
 using UnityEditor.SceneManagement;
 using TMPro;
 using StellarCommand.Core;
+#if ENABLE_INPUT_SYSTEM
+using UnityEngine.InputSystem.UI;
+#endif
 
 namespace StellarCommand.Editor
 {
@@ -79,10 +82,24 @@ namespace StellarCommand.Editor
         {
             var scene = EditorSceneManager.NewScene(NewSceneSetup.EmptyScene, NewSceneMode.Single);
 
-            // EventSystem (required for UI interaction)
+            // Camera — no AudioListener (Boot scene owns the listener; MainMenu loads additively)
+            var cameraGO = new GameObject("Main Camera");
+            cameraGO.tag = "MainCamera";
+            var cam = cameraGO.AddComponent<Camera>();
+            cam.clearFlags = CameraClearFlags.Depth;
+            cam.cullingMask = 1 << LayerMask.NameToLayer("UI");
+            cam.orthographic = true;
+            cam.depth = 1;
+            // AudioListener intentionally omitted — Boot camera provides it
+
+            // EventSystem — use new Input System module when active, legacy otherwise
             var esGO = new GameObject("EventSystem");
             esGO.AddComponent<EventSystem>();
+#if ENABLE_INPUT_SYSTEM
+            esGO.AddComponent<InputSystemUIInputModule>();
+#else
             esGO.AddComponent<StandaloneInputModule>();
+#endif
 
             // Canvas
             var canvasGO = new GameObject("Canvas");
