@@ -8,19 +8,22 @@ namespace StellarCommand.Core.Tests.EditMode
         [Test]
         public void SaveVersion_DefaultsToOne()
         {
-            Assert.Fail("Not implemented -- waiting for production code");
+            var data = new GameSaveData();
+            Assert.AreEqual(1, data.saveVersion);
         }
 
         [Test]
         public void MigrateFrom_DoesNotThrow()
         {
-            Assert.Fail("Not implemented -- waiting for production code");
+            var data = new GameSaveData();
+            Assert.DoesNotThrow(() => data.MigrateFrom(0));
         }
 
         [Test]
         public void CreateNew_SetsTimestamp()
         {
-            Assert.Fail("Not implemented -- waiting for production code");
+            var data = GameSaveData.CreateNew();
+            Assert.Greater(data.lastSaveTimestamp, 0);
         }
     }
 }
