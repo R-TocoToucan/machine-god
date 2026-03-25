@@ -1,104 +1,156 @@
-using UnityEngine;
-
 namespace StellarCommand.Core
 {
+    using UnityEngine;
+    using UnityEngine.Audio;
+
     public class SettingsManager : MonoSingleton<SettingsManager>
     {
-        private const string KEY_BGM_VOLUME = "Settings_BGMVolume";
-        private const string KEY_SFX_VOLUME = "Settings_SFXVolume";
-        private const string KEY_UI_VOLUME = "Settings_UIVolume";
-        private const string KEY_FULLSCREEN = "Settings_FullScreen";
-        private const string KEY_WALLPAPER_MODE = "Settings_WallpaperMode";
+        [SerializeField] private AudioMixer _masterMixer;
 
-        private float _bgmVolume = 1f;
-        private float _sfxVolume = 1f;
-        private float _uiVolume = 1f;
-        private bool _fullScreen = true;
-        private bool _wallpaperMode;
+        // Defaults
+        private const float DefaultVolume = 0.75f;
+        private const int DefaultBackgroundFps = 10;
+        private const int DefaultFullscreen = 1; // 1 = true
 
-        public float BGMVolume
+        // Cached values
+        private int _backgroundFps;
+        private int _savedVSyncCount;
+
+        protected override void OnInitialize()
         {
-            get => _bgmVolume;
-            set
-            {
-                _bgmVolume = Mathf.Clamp01(value);
-                AudioManager.Instance.SetBGMVolume(_bgmVolume);
-            }
-        }
-
-        public float SFXVolume
-        {
-            get => _sfxVolume;
-            set
-            {
-                _sfxVolume = Mathf.Clamp01(value);
-                AudioManager.Instance.SetSFXVolume(_sfxVolume);
-            }
-        }
-
-        public float UIVolume
-        {
-            get => _uiVolume;
-            set
-            {
-                _uiVolume = Mathf.Clamp01(value);
-                AudioManager.Instance.SetUIVolume(_uiVolume);
-            }
-        }
-
-        public bool FullScreen
-        {
-            get => _fullScreen;
-            set
-            {
-                _fullScreen = value;
-                Screen.fullScreen = _fullScreen;
-            }
-        }
-
-        public bool WallpaperMode
-        {
-            get => _wallpaperMode;
-            set
-            {
-                _wallpaperMode = value;
-                // TODO: Implement Win32 hook to embed window behind desktop icons
-                // Use user32.dll FindWindow/SetParent to parent under Progman/WorkerW
-            }
+            // Load cached values from PlayerPrefs (no audio here -- mixer not ready yet)
+            _backgroundFps = PlayerPrefs.GetInt(SettingsKeys.BackgroundFps, DefaultBackgroundFps);
+            _savedVSyncCount = QualitySettings.vSyncCount;
         }
 
         private void Start()
         {
-            Load();
+            // CRITICAL: Audio Mixer SetFloat MUST be called in Start(), not Awake/OnInitialize
+            // The mixer is not active during Awake -- calls silently fail (see Research Pitfall 3)
+            ApplyAudioSettings();
+            ApplyDisplaySettings();
         }
 
-        public void Save()
+        // -- Public API --
+
+        public float GetFloat(string key, float defaultValue)
         {
-            PlayerPrefs.SetFloat(KEY_BGM_VOLUME, _bgmVolume);
-            PlayerPrefs.SetFloat(KEY_SFX_VOLUME, _sfxVolume);
-            PlayerPrefs.SetFloat(KEY_UI_VOLUME, _uiVolume);
-            PlayerPrefs.SetInt(KEY_FULLSCREEN, _fullScreen ? 1 : 0);
-            PlayerPrefs.SetInt(KEY_WALLPAPER_MODE, _wallpaperMode ? 1 : 0);
+            return PlayerPrefs.GetFloat(key, defaultValue);
+        }
+
+        public void SetFloat(string key, float value)
+        {
+            PlayerPrefs.SetFloat(key, value);
             PlayerPrefs.Save();
         }
 
-        public void Load()
+        public int GetInt(string key, int defaultValue)
         {
-            _bgmVolume = PlayerPrefs.GetFloat(KEY_BGM_VOLUME, 1f);
-            _sfxVolume = PlayerPrefs.GetFloat(KEY_SFX_VOLUME, 1f);
-            _uiVolume = PlayerPrefs.GetFloat(KEY_UI_VOLUME, 1f);
-            _fullScreen = PlayerPrefs.GetInt(KEY_FULLSCREEN, 1) == 1;
-            _wallpaperMode = PlayerPrefs.GetInt(KEY_WALLPAPER_MODE, 0) == 1;
-
-            AudioManager.Instance.SetBGMVolume(_bgmVolume);
-            AudioManager.Instance.SetSFXVolume(_sfxVolume);
-            AudioManager.Instance.SetUIVolume(_uiVolume);
-            Screen.fullScreen = _fullScreen;
+            return PlayerPrefs.GetInt(key, defaultValue);
         }
 
-        private void OnApplicationQuit()
+        public void SetInt(string key, int value)
         {
-            Save();
+            PlayerPrefs.SetInt(key, value);
+            PlayerPrefs.Save();
+        }
+
+        // -- Audio --
+
+        public void SetMasterVolume(float linearVolume)
+        {
+            _masterMixer.SetFloat("MasterVolume", LinearToDecibel(linearVolume));
+            SetFloat(SettingsKeys.MasterVolume, linearVolume);
+        }
+
+        public void SetMusicVolume(float linearVolume)
+        {
+            _masterMixer.SetFloat("MusicVolume", LinearToDecibel(linearVolume));
+            SetFloat(SettingsKeys.MusicVolume, linearVolume);
+        }
+
+        public void SetSfxVolume(float linearVolume)
+        {
+            _masterMixer.SetFloat("SfxVolume", LinearToDecibel(linearVolume));
+            SetFloat(SettingsKeys.SfxVolume, linearVolume);
+        }
+
+        public float GetMasterVolume() => GetFloat(SettingsKeys.MasterVolume, DefaultVolume);
+        public float GetMusicVolume() => GetFloat(SettingsKeys.MusicVolume, DefaultVolume);
+        public float GetSfxVolume() => GetFloat(SettingsKeys.SfxVolume, DefaultVolume);
+
+        // -- Display --
+
+        public void SetFullscreen(bool isFullscreen)
+        {
+            Screen.fullScreen = isFullscreen;
+            SetInt(SettingsKeys.Fullscreen, isFullscreen ? 1 : 0);
+        }
+
+        public void SetResolution(int resolutionIndex)
+        {
+            var resolutions = Screen.resolutions;
+            if (resolutionIndex >= 0 && resolutionIndex < resolutions.Length)
+            {
+                var res = resolutions[resolutionIndex];
+                Screen.SetResolution(res.width, res.height, Screen.fullScreen);
+                SetInt(SettingsKeys.ResolutionIndex, resolutionIndex);
+            }
+        }
+
+        // -- Background FPS --
+
+        public void SetBackgroundFps(int fps)
+        {
+            _backgroundFps = fps;
+            SetInt(SettingsKeys.BackgroundFps, fps);
+        }
+
+        private void OnApplicationFocus(bool hasFocus)
+        {
+            if (hasFocus)
+            {
+                // Restore active settings
+                QualitySettings.vSyncCount = _savedVSyncCount;
+                Application.targetFrameRate = -1; // unlimited (or vsync-controlled)
+            }
+            else
+            {
+                // CRITICAL: vSync MUST be disabled before targetFrameRate takes effect
+                // (see Research Pitfall 4)
+                QualitySettings.vSyncCount = 0;
+                Application.targetFrameRate = _backgroundFps;
+            }
+        }
+
+        // -- Internal --
+
+        private void ApplyAudioSettings()
+        {
+            float master = GetFloat(SettingsKeys.MasterVolume, DefaultVolume);
+            float music = GetFloat(SettingsKeys.MusicVolume, DefaultVolume);
+            float sfx = GetFloat(SettingsKeys.SfxVolume, DefaultVolume);
+
+            _masterMixer.SetFloat("MasterVolume", LinearToDecibel(master));
+            _masterMixer.SetFloat("MusicVolume", LinearToDecibel(music));
+            _masterMixer.SetFloat("SfxVolume", LinearToDecibel(sfx));
+        }
+
+        private void ApplyDisplaySettings()
+        {
+            bool fullscreen = GetInt(SettingsKeys.Fullscreen, DefaultFullscreen) == 1;
+            Screen.fullScreen = fullscreen;
+
+            int resIndex = GetInt(SettingsKeys.ResolutionIndex, -1);
+            if (resIndex >= 0)
+            {
+                SetResolution(resIndex);
+            }
+        }
+
+        private static float LinearToDecibel(float linear)
+        {
+            return linear > 0.0001f ? Mathf.Log10(linear) * 20f : -80f;
         }
     }
 }
