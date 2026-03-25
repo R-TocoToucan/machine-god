@@ -1,32 +1,70 @@
 using NUnit.Framework;
+using UnityEngine;
 
 namespace StellarCommand.Core.Tests.EditMode
 {
     [TestFixture]
     public class GameManagerTests
     {
-        [Test]
-        public void SetState_FiresOnStateChanged()
+        private GameManager _gameManager;
+
+        [SetUp]
+        public void SetUp()
         {
-            Assert.Fail("Not implemented -- waiting for production code");
+            var go = new GameObject("TestGameManager");
+            _gameManager = go.AddComponent<GameManager>();
         }
 
-        [Test]
-        public void SetState_SameState_DoesNotFire()
+        [TearDown]
+        public void TearDown()
         {
-            Assert.Fail("Not implemented -- waiting for production code");
+            Object.DestroyImmediate(_gameManager.gameObject);
         }
 
         [Test]
         public void InitialState_IsBoot()
         {
-            Assert.Fail("Not implemented -- waiting for production code");
+            Assert.AreEqual(GameManager.GameState.Boot, _gameManager.CurrentState);
+        }
+
+        [Test]
+        public void SetState_FiresOnStateChanged()
+        {
+            int fireCount = 0;
+            _gameManager.OnStateChanged += (oldState, newState) => fireCount++;
+
+            _gameManager.SetState(GameManager.GameState.MainMenu);
+
+            Assert.AreEqual(1, fireCount);
+        }
+
+        [Test]
+        public void SetState_SameState_DoesNotFire()
+        {
+            int fireCount = 0;
+            _gameManager.OnStateChanged += (oldState, newState) => fireCount++;
+
+            _gameManager.SetState(GameManager.GameState.Boot);
+
+            Assert.AreEqual(0, fireCount);
         }
 
         [Test]
         public void OnStateChanged_ReceivesOldAndNewState()
         {
-            Assert.Fail("Not implemented -- waiting for production code");
+            GameManager.GameState receivedOld = GameManager.GameState.Boot;
+            GameManager.GameState receivedNew = GameManager.GameState.Boot;
+
+            _gameManager.OnStateChanged += (oldState, newState) =>
+            {
+                receivedOld = oldState;
+                receivedNew = newState;
+            };
+
+            _gameManager.SetState(GameManager.GameState.MainMenu);
+
+            Assert.AreEqual(GameManager.GameState.Boot, receivedOld);
+            Assert.AreEqual(GameManager.GameState.MainMenu, receivedNew);
         }
     }
 }
