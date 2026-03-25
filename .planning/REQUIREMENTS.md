@@ -7,11 +7,11 @@
 
 ### System Foundations
 
-- [ ] **FOUND-01**: Single save slot — game state auto-saves continuously, no manual save/load UI
-- [ ] **FOUND-02**: Save file includes a `saveVersion` integer for future migration support
-- [ ] **FOUND-03**: Save writes are atomic (write-temp-then-move) to prevent corruption on crash
+- [x] **FOUND-01**: Single save slot — game state auto-saves continuously, no manual save/load UI
+- [x] **FOUND-02**: Save file includes a `saveVersion` integer for future migration support
+- [x] **FOUND-03**: Save writes are atomic (write-temp-then-move) to prevent corruption on crash
 - [ ] **FOUND-04**: Save state syncs to Firebase (Firestore or Realtime Database — TBD) as a corruption-proof backup per user document
-- [ ] **FOUND-05**: Boot scene auto-loads existing save on start; no "Continue" choice needed
+- [x] **FOUND-05**: Boot scene auto-loads existing save on start; no "Continue" choice needed
 - [ ] **FOUND-06**: Boot scene initializes all core singletons before transitioning
 - [ ] **FOUND-07**: Scene flow supports Boot → Main Menu → Game with async additive loading
 - [ ] **FOUND-08**: Main menu has New Game (triggers data wipe confirmation), Settings, and Quit — no load option
